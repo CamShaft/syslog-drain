@@ -1,0 +1,21 @@
+
+# Start SASL
+-boot start_sasl
+
+# Start main application
+-s syslog_drain
+
+# Start 'sync' script, for auto-reloading
+-s sync
+
+# Node name
+-name syslog_drain@127.0.0.1
+
+# Cookie name
+-setcookie syslog_drain
+
+# Kernel polling
++K true
+
+# 4 async threads
++A 4
