@@ -4,7 +4,7 @@
 %%
 -module (syslog_drain).
 
--export ([start_server/4]).
+-export([start_server/4]).
 -export([stop_listener/1]).
 -export([set_env/3]).
 

@@ -1,9 +1,9 @@
--module (syslog_drain_octet_parser).
+-module(syslog_drain_octet_parser).
 
--export ([parse/1]).
+-export([parse/1]).
 
 %% http://tools.ietf.org/html/rfc3164#section-4.1
--define (MAX_LENGTH, 1024).
+-define(MAX_LENGTH, 1024).
 
 %%%%
 %% Iterate through the buffer and gather valid octet frames

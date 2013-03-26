@@ -1,4 +1,4 @@
--module (syslog_drain_protocol).
+-module(syslog_drain_protocol).
 
 -export([start_link/4, init/4]).
 
