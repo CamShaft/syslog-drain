@@ -16,11 +16,13 @@ start_link(ListenerPid, Socket, Transport, Opts) ->
 init(ListenerPid, Socket, Transport, Opts) ->
   Parsers = syslog_drain:get_value(parsers, Opts, []),
   Emitters = syslog_drain:get_value(emitters, Opts, []),
+  Feedback = syslog_drain:get_value(feedback, Opts, false),
   ok = ranch:accept_ack(ListenerPid),
-  recv(<<>>, Socket, Transport, #handlers{parsers=Parsers, emitters=Emitters}).
+  recv(<<>>, Socket, Transport, #drain_opts{parsers=Parsers, emitters=Emitters,
+    feedback=Feedback}).
 
 %% @private
--spec recv(binary(), inet:socket(), module(), #handlers{}) -> ok.
+-spec recv(binary(), inet:socket(), module(), #drain_opts{}) -> ok.
 recv(Buffer, Socket, Transport, Options) ->
   case Transport:recv(Socket, 0, infinity) of
     {ok, Data} ->

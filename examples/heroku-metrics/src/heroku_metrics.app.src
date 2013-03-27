@@ -1,0 +1,13 @@
+{application, heroku_metrics, [
+  {description, "syslog-drain Heroku metrics example."},
+  {vsn, "1"},
+  {modules, []},
+  {registered, []},
+  {applications, [
+    kernel,
+    stdlib,
+    syslog_drain
+  ]},
+  {mod, {heroku_metrics_app, []}},
+  {env, []}
+]}.

@@ -14,7 +14,7 @@
 start_server(Ref, NbAcceptors, TransOpts, ProtoOpts)
     when is_integer(NbAcceptors), NbAcceptors > 0 ->
   ranch:start_listener(Ref, NbAcceptors,
-    ranch_tcp, TransOpts, syslog_drain, ProtoOpts).
+    ranch_tcp, TransOpts, syslog_drain_protocol, ProtoOpts).
 
 %% @doc Stop a listener.
 -spec stop_listener(any()) -> ok.
@@ -28,9 +28,7 @@ stop_listener(Ref) ->
 -spec set_env(any(), atom(), any()) -> ok.
 set_env(Ref, Name, Value) ->
   Opts = ranch:get_protocol_options(Ref),
-  {_, Env} = lists:keyfind(env, 1, Opts),
-  Env2 = [{Name, Value}|lists:keydelete(Name, 1, Env)],
-  Opts2 = lists:keyreplace(env, 1, Opts, {env, Env2}),
+  Opts2 = [{Name, Value}|lists:keydelete(Name, 1, Opts)],
   ok = ranch:set_protocol_options(Ref, Opts2).
 
 
