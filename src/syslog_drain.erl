@@ -7,6 +7,7 @@
 -export([start_server/4]).
 -export([stop_listener/1]).
 -export([set_env/3]).
+-export([get_value/3]).
 
 %% @doc Start a syslog drain listener.
 -spec start_server(any(), non_neg_integer(), any(), any()) -> {ok, pid()}.
@@ -31,3 +32,12 @@ set_env(Ref, Name, Value) ->
   Env2 = [{Name, Value}|lists:keydelete(Name, 1, Env)],
   Opts2 = lists:keyreplace(env, 1, Opts, {env, Env2}),
   ok = ranch:set_protocol_options(Ref, Opts2).
+
+
+%% @doc Faster alternative to proplists:get_value/3.
+%% @private
+get_value(Key, Opts, Default) ->
+  case lists:keyfind(Key, 1, Opts) of
+    {_, Value} -> Value;
+    _ -> Default
+  end.
