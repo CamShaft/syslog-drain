@@ -4,6 +4,6 @@
 -record(drain_opts, {
   parsers :: [module()],
   mappers :: [module()],
-  emitters :: [module()],
+  routes :: [module()],
   feedback :: boolean()
 }).

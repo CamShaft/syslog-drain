@@ -1,12 +1,15 @@
 -module(syslog_drain_router).
 
 -include("syslog_drain.hrl").
+-include_lib("eunit/include/eunit.hrl").
 
--export([compile/1]).
--export([match/3]).
+-export([compile/2]).
+-export([match/2]).
 
-compile(_)->
-  {}.
+%% TODO design the router
 
-match(_, _, _)->
-  ok.
+compile([Emitter|_Emitters], Messages)->
+  {Emitter, Messages}.
+
+match(_, _)->
+  true.
