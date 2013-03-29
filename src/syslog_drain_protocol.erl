@@ -1,6 +1,6 @@
 -module(syslog_drain_protocol).
 
--include("syslog_drain.hrl").
+-include_lib("syslog_pipeline/include/syslog_pipeline.hrl").
 
 -export([start_link/4, init/4]).
 
@@ -23,10 +23,18 @@ init(ListenerPid, Socket, Transport, Opts) ->
 
 %% @private
 -spec recv(binary(), inet:socket(), module(), #drain_opts{}) -> ok.
+recv(<<>>, Socket, Transport, Options) ->
+  case Transport:recv(Socket, 0, infinity) of
+    {ok, Data} ->
+      Buffer = syslog_pipeline:handle(Data, Options),
+      recv(Buffer, Socket, Transport, Options);
+    {error, _}->
+      terminate(Socket, Transport)
+  end;
 recv(Buffer, Socket, Transport, Options) ->
   case Transport:recv(Socket, 0, infinity) of
     {ok, Data} ->
-      Buffer2 = syslog_drain_handler:handle(<<Buffer/binary, Data/binary>>, Options),
+      Buffer2 = syslog_pipeline:handle(<<Buffer/binary, Data/binary>>, Options),
       recv(Buffer2, Socket, Transport, Options);
     {error, _}->
       terminate(Socket, Transport)
