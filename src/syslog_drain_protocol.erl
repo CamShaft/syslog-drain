@@ -1,17 +1,17 @@
 -module(syslog_drain_protocol).
 
--export([start_link/4, init/4]).
+-export([start_link/4, init/3]).
 
 %% @doc Start an syslog protocol process.
 -spec start_link(pid(), inet:socket(), module(), any()) -> {ok, pid()}.
-start_link(ListenerPid, Socket, Transport, Opts) ->
-  Pid = spawn_link(?MODULE, init, [ListenerPid, Socket, Transport, Opts]),
+start_link(ListenerPid, Socket, Transport, _Opts) ->
+  Pid = spawn_link(?MODULE, init, [ListenerPid, Socket, Transport]),
   {ok, Pid}.
 
 %% Internal.
 
--spec init(pid(), inet:socket(), module(), any()) -> ok.
-init(ListenerPid, Socket, Transport, Opts) ->
+-spec init(pid(), inet:socket(), module()) -> ok.
+init(ListenerPid, Socket, Transport) ->
   ok = ranch:accept_ack(ListenerPid),
   recv(<<>>, Socket, Transport).
 
