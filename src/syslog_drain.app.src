@@ -1,14 +1,9 @@
-{application, syslog_drain,
- [
+{application, syslog_drain, [
   {id, "syslog-drain"},
   {description, "Generic syslog drain"},
   {vsn, "0.1.0"},
   {registered, [syslog_drain_sup]},
-  {applications, [
-                  kernel,
-                  stdlib,
-                  ranch
-                 ]},
+  {applications, [kernel, stdlib, ranch, syslog_pipeline]},
   {mod, { syslog_drain_app, []}},
   {env, []}
- ]}.
+]}.

@@ -1,7 +1,5 @@
 -module(syslog_drain_protocol).
 
--include_lib("syslog_pipeline/include/syslog_pipeline.hrl").
-
 -export([start_link/4, init/4]).
 
 %% @doc Start an syslog protocol process.
@@ -14,28 +12,24 @@ start_link(ListenerPid, Socket, Transport, Opts) ->
 
 -spec init(pid(), inet:socket(), module(), any()) -> ok.
 init(ListenerPid, Socket, Transport, Opts) ->
-  Parsers = syslog_drain:get_value(parsers, Opts, []),
-  Routes = syslog_drain:get_value(routes, Opts, []),
-  Feedback = syslog_drain:get_value(feedback, Opts, false),
   ok = ranch:accept_ack(ListenerPid),
-  recv(<<>>, Socket, Transport, #drain_opts{parsers=Parsers, routes=Routes,
-    feedback=Feedback}).
+  recv(<<>>, Socket, Transport).
 
 %% @private
--spec recv(binary(), inet:socket(), module(), #drain_opts{}) -> ok.
-recv(<<>>, Socket, Transport, Options) ->
+-spec recv(binary(), inet:socket(), module()) -> ok.
+recv(<<>>, Socket, Transport) ->
   case Transport:recv(Socket, 0, infinity) of
     {ok, Data} ->
-      Buffer = syslog_pipeline:handle(Data, Options),
-      recv(Buffer, Socket, Transport, Options);
+      Buffer = syslog_pipeline:handle(Data),
+      recv(Buffer, Socket, Transport);
     {error, _}->
       terminate(Socket, Transport)
   end;
-recv(Buffer, Socket, Transport, Options) ->
+recv(Buffer, Socket, Transport) ->
   case Transport:recv(Socket, 0, infinity) of
     {ok, Data} ->
-      Buffer2 = syslog_pipeline:handle(<<Buffer/binary, Data/binary>>, Options),
-      recv(Buffer2, Socket, Transport, Options);
+      Buffer2 = syslog_pipeline:handle(<<Buffer/binary, Data/binary>>),
+      recv(Buffer2, Socket, Transport);
     {error, _}->
       terminate(Socket, Transport)
   end.
