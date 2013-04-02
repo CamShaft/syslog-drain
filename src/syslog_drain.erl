@@ -6,38 +6,52 @@
 
 -export([start_server/4]).
 -export([stop_listener/1]).
--export([set_env/3]).
--export([get_value/3]).
+-export([start_link/4]).
+-export([init/3]).
 
 %% @doc Start a syslog drain listener.
 -spec start_server(any(), non_neg_integer(), any(), any()) -> {ok, pid()}.
-start_server(Ref, NbAcceptors, TransOpts, ProtoOpts)
-    when is_integer(NbAcceptors), NbAcceptors > 0 ->
-  ranch:start_listener(Ref, NbAcceptors,
-    ranch_tcp, TransOpts, syslog_drain, ProtoOpts).
+start_server(Ref, NbAcceptors, TransOpts, ProtoOpts) when is_integer(NbAcceptors), NbAcceptors > 0 ->
+  ranch:start_listener(Ref, NbAcceptors, ranch_tcp, TransOpts, ?MODULE, ProtoOpts).
 
 %% @doc Stop a listener.
 -spec stop_listener(any()) -> ok.
 stop_listener(Ref) ->
   ranch:stop_listener(Ref).
 
-%% @doc Convenience function for setting an environment value.
-%%
-%% Allows you to update live an environment value; mainly used to
-%% add/remove parsers and emitters
--spec set_env(any(), atom(), any()) -> ok.
-set_env(Ref, Name, Value) ->
-  Opts = ranch:get_protocol_options(Ref),
-  {_, Env} = lists:keyfind(env, 1, Opts),
-  Env2 = [{Name, Value}|lists:keydelete(Name, 1, Env)],
-  Opts2 = lists:keyreplace(env, 1, Opts, {env, Env2}),
-  ok = ranch:set_protocol_options(Ref, Opts2).
+%% @doc Start an syslog protocol process.
+-spec start_link(pid(), inet:socket(), module(), any()) -> {ok, pid()}.
+start_link(ListenerPid, Socket, Transport, _Opts) ->
+  Pid = spawn_link(?MODULE, init, [ListenerPid, Socket, Transport]),
+  {ok, Pid}.
 
+%% Internal.
+-spec init(pid(), inet:socket(), module()) -> ok.
+init(ListenerPid, Socket, Transport) ->
+  ok = ranch:accept_ack(ListenerPid),
+  recv(<<>>, Socket, Transport).
 
-%% @doc Faster alternative to proplists:get_value/3.
 %% @private
-get_value(Key, Opts, Default) ->
-  case lists:keyfind(Key, 1, Opts) of
-    {_, Value} -> Value;
-    _ -> Default
+-spec recv(binary(), inet:socket(), module()) -> ok.
+recv(<<>>, Socket, Transport) ->
+  case Transport:recv(Socket, 0, infinity) of
+    {ok, Data} ->
+      Buffer = syslog_pipeline:handle(Data),
+      recv(Buffer, Socket, Transport);
+    {error, _}->
+      terminate(Socket, Transport)
+  end;
+recv(Buffer, Socket, Transport) ->
+  case Transport:recv(Socket, 0, infinity) of
+    {ok, Data} ->
+      Buffer2 = syslog_pipeline:handle(<<Buffer/binary, Data/binary>>),
+      recv(Buffer2, Socket, Transport);
+    {error, _}->
+      terminate(Socket, Transport)
   end.
+
+%% @private
+-spec terminate(inet:socket(), module()) -> ok.
+terminate(Socket, Transport)->
+  Transport:close(Socket),
+  ok.
