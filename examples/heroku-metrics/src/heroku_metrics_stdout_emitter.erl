@@ -1,6 +1,6 @@
 -module(heroku_metrics_stdout_emitter).
 
--export([emit/1]).
+-export([send/1]).
 
-emit(Messages)->
+send(Messages)->
   io:format("~p~n", [Messages]).
