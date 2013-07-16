@@ -1,7 +1,7 @@
-syslog-drain [![Build Status](https://travis-ci.org/CamShaft/syslog-drain.png?branch=master)](https://travis-ci.org/CamShaft/syslog-drain)
+syslog-pipeline-tcp [![Build Status](https://travis-ci.org/CamShaft/syslog-pipeline-tcp.png?branch=master)](https://travis-ci.org/CamShaft/syslog-pipeline-tcp)
 ============
 
-Syslog drain
+TCP adapter for [syslog-pipeline](https://github.com/CamShaft/syslog-pipeline)
 
 Concept
 -------

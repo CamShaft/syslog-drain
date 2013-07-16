@@ -6,7 +6,7 @@
   {applications, [
     kernel,
     stdlib,
-    syslog_drain
+    syslog_pipeline_tcp
   ]},
   {mod, {heroku_metrics_app, []}},
   {env, []}

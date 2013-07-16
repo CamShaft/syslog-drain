@@ -11,7 +11,7 @@
 start(_Type, _Args) ->
   syslog_pipeline_riemann_emitter:start("127.0.0.1", 5555),
 
-  {ok, _} = syslog_drain:start_server(syslog, 100, [{port, 10514}], [
+  {ok, _} = syslog_pipeline_tcp:start_server(syslog, 100, [{port, 10514}], [
     {body_parser, syslog_message_keyvalue},
     {emitters, [
       {heroku_metrics_stdout_emitter, [

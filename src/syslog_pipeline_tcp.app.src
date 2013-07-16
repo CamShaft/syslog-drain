@@ -1,0 +1,14 @@
+{application, syslog_pipeline_tcp, [
+  {id, "syslog-drain"},
+  {description, "TCP adapter for syslog pipeline"},
+  {vsn, "0.1.0"},
+  {registered, [syslog_pipeline_tcp_sup]},
+  {applications, [
+  	kernel,
+  	stdlib,
+  	ranch,
+  	syslog_pipeline
+  ]},
+  {mod, { syslog_pipeline_tcp_app, []}},
+  {env, []}
+]}.

@@ -1,4 +1,4 @@
--module(syslog_drain_app).
+-module(syslog_pipeline_tcp_app).
 
 -behaviour(application).
 
@@ -9,7 +9,7 @@
 %% API.
 
 start(_StartType, _StartArgs) ->
-  syslog_drain_sup:start_link().
+  syslog_pipeline_tcp_sup:start_link().
 
 stop(_State) ->
   ok.
