@@ -9,6 +9,8 @@
 %% API.
 
 start(_Type, _Args) ->
+  syslog_pipeline_riemann_emitter:start("127.0.0.1", 5555),
+
   {ok, _} = syslog_drain:start_server(syslog, 100, [{port, 10514}], [
     {body_parser, syslog_message_keyvalue},
     {emitters, [
@@ -18,6 +20,7 @@ start(_Type, _Args) ->
       ]}
     ]}
   ]),
+
   heroku_metrics_sup:start_link().
 
 stop(_State) ->

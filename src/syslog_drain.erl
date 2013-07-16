@@ -12,7 +12,6 @@
 %% @doc Start a syslog drain listener.
 -spec start_server(any(), non_neg_integer(), any(), any()) -> {ok, pid()}.
 start_server(Ref, NbAcceptors, TransOpts, Opts) when is_integer(NbAcceptors), NbAcceptors > 0 ->
-  %% TODO start the pipeline
   NumWorkers = proplists:get_value(num_workers, Opts, 10),
   BodyParser = proplists:get_value(body_parser, Opts),
   Emitters = proplists:get_value(emitters, Opts, []),
